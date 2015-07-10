@@ -27,12 +27,7 @@ object StartData {
           Employee(Option(3L), "Alexander", "USA", None, new java.util.Date, Some("Manager")),
           Employee(Option(4L), "Stefan", "USA", None, new java.util.Date, Some("Trainee")),
           Employee(Option(5L), "Robin", "USA", None, new java.util.Date, Some("Assistant")),
-          Employee(Option(6L), "Pankaj", "India", None, new java.util.Date, Some("Manager")),
-          Employee(Option(7L), "Mayank", "India", None, new java.util.Date, Some("Trainee")),
-          Employee(Option(8L), "David", "UK", None, new java.util.Date, Some("Assistant")),
-          Employee(Option(9L), "Philip", "Germany", None, new java.util.Date, Some("Manager")),
-          Employee(Option(10L), "Fred", "USA", None, new java.util.Date, Some("Trainee")),
-          Employee(Option(11L), "Louis", "Canada", None, new java.util.Date, Some("Assistant")))
+          Employee(Option(6L), "Ivan Drago", "USSR", None, new java.util.Date, Some("KGB Agent")))
         employees.map(DAO.insert)
       }
     }

@@ -3,21 +3,27 @@
 # ~~~~
 
 # Default path will just redirect to the employee list
-GET    /                       controllers.Application.index
+GET           /                            controllers.Application.index
 
 # Employees list (look at the default values for pagination parameters)
-GET    /employees              controllers.Application.list(p:Int ?= 0, s:Int ?= 2, f ?= "")
+GET           /employees                   controllers.Application.list(p:Int ?= 0, s:Int ?= 2, f ?= "")
+GET           /api/employees               controllers.EmployeeController.list(p:Int ?= 0, s:Int ?= 2, f ?= "")
 
 # Add employee
-GET    /employees/new          controllers.Application.create
-POST   /employees              controllers.Application.save
+GET           /employees/new               controllers.Application.create
+POST          /employees                   controllers.Application.save
+POST          /api/employees               controllers.EmployeeController.save
+
 
 # Edit existing employee
-GET    /employees/:id          controllers.Application.edit(id:Long)
-POST   /employees/:id          controllers.Application.update(id:Long)
+GET           /employees/:id               controllers.Application.edit(id:Long)
+GET           /api/employees/:id           controllers.EmployeeController.getById(id:Long)
+POST          /employees/:id               controllers.Application.update(id:Long)
+PUT           /api/employees/:id           controllers.EmployeeController.update(id:Long)
 
 # Delete an employee
-POST   /employees/:id/delete   controllers.Application.delete(id:Long)
+POST          /employees/:id/delete        controllers.Application.delete(id:Long)
+DELETE        /api/employees/:id           controllers.Application.delete(id:Long)
 
 # Map static resources from the /public folder to the /assets URL path
-GET    /assets/*file           controllers.Assets.at(path="/public", file)
+GET           /assets/*file                controllers.Assets.at(path="/public", file)
