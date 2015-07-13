@@ -1,6 +1,7 @@
 import java.text.SimpleDateFormat
 import play.api._
 import models._
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object Global extends GlobalSettings {
@@ -16,20 +17,24 @@ object Global extends GlobalSettings {
  */
 object StartData {
 
-  val sdf = new SimpleDateFormat("MM/dd/yyyy")
-
+  val jdbcDao = new JdbcDAO
   def insert(): Unit = {
-    DAO.count map { size =>
-      if (size == 0) {
-        val employees = Seq(
-          Employee(Option(1L), "John", "USA", None, new java.util.Date, Some("Trainee")),
-          Employee(Option(2L), "Miles", "USA", None, new java.util.Date, Some("Assistant")),
-          Employee(Option(3L), "Alexander", "USA", None, new java.util.Date, Some("Manager")),
-          Employee(Option(4L), "Stefan", "USA", None, new java.util.Date, Some("Trainee")),
-          Employee(Option(5L), "Robin", "USA", None, new java.util.Date, Some("Assistant")),
-          Employee(Option(6L), "Ivan Drago", "USSR", None, new java.util.Date, Some("KGB Agent")))
-        employees.map(DAO.insert)
-      }
+    val size = jdbcDao.count
+
+    if (size == 0) {
+      val employees = ArrayBuffer(
+        Employee(Option(1L), "John", "USA", None, new java.util.Date, Some("Trainee")),
+        Employee(Option(2L), "Miles", "USA", None, new java.util.Date, Some("Assistant")),
+        Employee(Option(3L), "Alexander", "USA", None, new java.util.Date, Some("Manager")),
+        Employee(Option(4L), "Stefan", "USA", None, new java.util.Date, Some("Trainee")),
+        Employee(Option(5L), "Robin", "USA", None, new java.util.Date, Some("Assistant")),
+        Employee(Option(6L), "Ivan Drago", "USSR", None, new java.util.Date, Some("KGB Agent")))
+
+      for (i <- 7 to 9900)
+        employees += Employee(Option(i), s"Name_$i", "USA", None, new java.util.Date, Some("Generated"))
+
+      employees.foreach(e => jdbcDao.insert(e))
     }
+
   }
 }
