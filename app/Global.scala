@@ -1,6 +1,8 @@
-import java.text.SimpleDateFormat
+import java.lang.management.ManagementFactory
+
 import play.api._
 import models._
+import play.api.mvc.EssentialAction
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -8,6 +10,11 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     StartData.insert()
+  }
+
+  override def doFilter(action: EssentialAction) = EssentialAction { request =>
+    Logger.info(s"Thread count: ${ManagementFactory.getThreadMXBean.getThreadCount} ")
+    action(request)
   }
 
 }
