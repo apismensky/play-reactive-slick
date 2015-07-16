@@ -8,6 +8,8 @@ scalaVersion := "2.11.7"
 
 javaOptions in Test ++= Seq("-Dconfig.file=conf/test.conf")
 
+resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
 routesGenerator := InjectedRoutesGenerator
 
 libraryDependencies ++= Seq(
