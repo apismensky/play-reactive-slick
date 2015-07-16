@@ -1,11 +1,13 @@
 package controllers
 
+import com.google.inject.Inject
+import play.api.i18n.{I18nSupport, MessagesApi}
 import views._
 import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
-import models.{ DAOComponent, DAO, Employee }
+import models.{ DAO, Employee }
 import java.util.concurrent.TimeoutException
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
  * Manage a database of employees
  */
-class Application(dao: DAOComponent) extends Controller {
+class Application @Inject() (dao: DAO, val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   /**
    * This result directly redirect to the application home.
@@ -116,4 +118,3 @@ class Application(dao: DAOComponent) extends Controller {
 
 }
 
-object Application extends Application(DAO)

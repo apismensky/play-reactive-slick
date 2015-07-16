@@ -1,53 +1,18 @@
 package controllers
 
-
-import java.util.Date
-
-import models.{Page, Employee, DAO, DAOComponent}
+import com.google.inject.Inject
+import models.{Employee, DAO}
 import play.api.Logger
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads._
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc.{Action, AnyContent}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class EmployeeController(dao: DAOComponent) extends Controller {
-
-  implicit val employeeWrites = new Writes[Employee] {
-    def writes(e: Employee) = Json.obj(
-      "id" -> e.id,
-      "name" -> e.name,
-      "address" -> e.address,
-      "dob" -> e.dob,
-      "joiningDate" -> e.joiningDate,
-      "designation" -> e.designation
-    )
-  }
-
-  implicit val employeeReads: Reads[Employee] = (
-      (JsPath \ "id").read[Option[Long]] and
-      (JsPath \ "name").read[String] and
-      (JsPath \ "address").read[String] and
-      (JsPath \ "dob").read[Option[Date]] and
-      (JsPath \ "joiningDate").read[Date] and
-      (JsPath \ "designation").read[Option[String]]
-    )(Employee.apply _)
-
-
-  implicit val pageWrites = new Writes[Page[Employee]] {
-    def writes(p: Page[Employee]) = {
-      Json.obj(
-        "next" -> p.next,
-        "prev" -> p.prev,
-         "items" -> p.items.map(e => employeeWrites.writes(e))
-      )
-    }
-  }
+class EmployeeControllerSlick @Inject() (dao: DAO) extends ApiController {
 
   /**
    * This result directly redirect to the application home.
    */
-  val Home = Redirect(routes.EmployeeController.list(0, 2, ""))
+  val Home = Redirect(routes.EmployeeControllerSlick.list(0, 2, ""))
 
   def getById(id: Long): Action[AnyContent] = Action.async { implicit request =>
     dao.findById(id).map(employee => Ok(Json.toJson(employee))).recover {
@@ -65,7 +30,7 @@ class EmployeeController(dao: DAOComponent) extends Controller {
       Ok(Json.toJson(pageEmp))
     }.recover {
       case ex: Exception =>
-        Logger.error("Problem found in employee list process")
+        Logger.error("Problem found in employee list process: " + ex.getMessage)
         InternalServerError(ex.getMessage)
     }
   }
@@ -76,7 +41,7 @@ class EmployeeController(dao: DAOComponent) extends Controller {
   def delete(id: Long): Action[AnyContent] = Action.async { implicit request =>
       dao.delete(id).map { result => Home }.recover {
       case ex: Exception =>
-        Logger.error("Problem found in employee delete process")
+        Logger.error("Problem found in employee delete process: " + ex.getMessage)
         InternalServerError(ex.getMessage)
     }
   }
@@ -88,7 +53,7 @@ class EmployeeController(dao: DAOComponent) extends Controller {
     val jsValue = request.body.asJson.getOrElse(throw new IllegalArgumentException("Can not read JSON request body"))
     dao.insert(jsValue.as[Employee]).map { result => Home }.recover {
       case ex: Exception =>
-        Logger.error("Problem found in employee save process")
+        Logger.error("Problem found in employee save process: " + ex.getMessage)
         InternalServerError(ex.getMessage)
     }
   }
@@ -101,10 +66,9 @@ class EmployeeController(dao: DAOComponent) extends Controller {
     val e: Employee = jsValue.as[Employee]
     dao.update(id, e.copy(id = Some(id))).map { result => Home }.recover {
       case ex: Exception =>
-        Logger.error("Problem found in employee update process")
+        Logger.error("Problem found in employee update process: " + ex.getMessage)
         InternalServerError(ex.getMessage)
     }
   }
 }
 
-object EmployeeController extends EmployeeController(DAO)

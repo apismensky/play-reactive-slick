@@ -1,46 +1,12 @@
 package controllers
 
-import java.util.Date
-import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads._
+import com.google.inject.Inject
 
-import models.{JdbcDAO, Page, Employee}
-import play.api.libs.json.{JsPath, Reads, Json, Writes}
-import play.api.mvc.{Controller, AnyContent, Action}
+import models.{JdbcDAO, Employee}
+import play.api.libs.json.Json
+import play.api.mvc.{AnyContent, Action}
 
-class EmployeeControllerJdbc extends Controller {
-  implicit val employeeWrites = new Writes[Employee] {
-    def writes(e: Employee) = Json.obj(
-      "id" -> e.id,
-      "name" -> e.name,
-      "address" -> e.address,
-      "dob" -> e.dob,
-      "joiningDate" -> e.joiningDate,
-      "designation" -> e.designation
-    )
-  }
-
-  implicit val employeeReads: Reads[Employee] = (
-    (JsPath \ "id").read[Option[Long]] and
-      (JsPath \ "name").read[String] and
-      (JsPath \ "address").read[String] and
-      (JsPath \ "dob").read[Option[Date]] and
-      (JsPath \ "joiningDate").read[Date] and
-      (JsPath \ "designation").read[Option[String]]
-    )(Employee.apply _)
-
-
-  implicit val pageWrites = new Writes[Page[Employee]] {
-    def writes(p: Page[Employee]) = {
-      Json.obj(
-        "next" -> p.next,
-        "prev" -> p.prev,
-        "items" -> p.items.map(e => employeeWrites.writes(e))
-      )
-    }
-  }
-
-  val dao = new JdbcDAO
+class EmployeeControllerJdbc @Inject() (dao: JdbcDAO) extends ApiController {
 
   val Home = Redirect(routes.EmployeeControllerJdbc.list(0, 2, ""))
 
